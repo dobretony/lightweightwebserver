@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LightweightWebServer.iml" filepath="$PROJECT_DIR$/LightweightWebServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lightweightwebserver.iml" filepath="$PROJECT_DIR$/lightweightwebserver.iml" />
     </modules>
   </component>
 </project>
