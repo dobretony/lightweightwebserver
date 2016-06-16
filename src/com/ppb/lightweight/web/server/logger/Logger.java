@@ -3,6 +3,7 @@ package com.ppb.lightweight.web.server.logger;
 import java.io.*;
 
 import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
+import com.ppb.lightweight.web.server.utils.Configurations;
 import com.ppb.lightweight.web.server.utils.Constants;
 import com.ppb.lightweight.web.server.utils.Utils;
 
@@ -42,9 +43,11 @@ public class Logger {
     public static void initializeLogger() throws WebServerInitializationException{
 
         // check if a logs folder exists and create if not
-        File directory = new File(Constants.DEFAULT_LOGGER_OUTPUT_DIRECTORY);
+        File directory = new File(Configurations.LOG_FOLDER_PATH);
         if (! directory.exists()){
-            directory.mkdir();
+            if(!directory.mkdir()){
+                throw new WebServerInitializationException("Can not create logs directory. Aborting...");
+            }
         }
 
         // create the current log file for this run
@@ -118,6 +121,16 @@ public class Logger {
         sb.append(" " + message);
 
         Logger.logger.out.println(sb.toString());
+    }
+
+    /**
+     * Outputs to terminal.
+     * @param message
+     */
+    public static void outputWrite(String message){
+
+        System.out.println(message);
+
     }
 
 
