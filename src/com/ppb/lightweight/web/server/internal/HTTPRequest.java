@@ -4,6 +4,7 @@ import com.ppb.lightweight.web.server.errors.MalformedRequestException;
 import com.ppb.lightweight.web.server.utils.IPUtils;
 import com.ppb.lightweight.web.server.internal.HTTPConstants.REQUEST_TYPE;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 
 /**
@@ -15,16 +16,16 @@ public class HTTPRequest {
     private HashMap<String, String> headers = null;
     private String requestURI = null;
     private String httpVersion = null;
-    private long clientIPAddress = -1;
+    private InetAddress clientIPAddress = null;
 
-    public HTTPRequest(String requestLine, long clientIPAddress) throws MalformedRequestException {
+    public HTTPRequest(String requestLine, InetAddress clientIPAddress) throws MalformedRequestException {
         String[] requests = requestLine.split(" ");
 
         // check if request line was parsed ok and is valid
         if(requests.length != 3)
             throw new MalformedRequestException("An error occurred with request: " +
                                                 requestLine +
-                                                " from client " + IPUtils.ipAddressToString(clientIPAddress) +
+                                                " from client " + clientIPAddress.toString() +
                                                 ". REASON: Bad request from client.",
                                                 HTTPConstants.HTTP_RESPONSE_CODES.BAD_REQUEST,
                                                 true);
@@ -36,7 +37,7 @@ public class HTTPRequest {
         if(this.requestType == REQUEST_TYPE.UNDEFINED)
             throw new MalformedRequestException("An error occurred with request: " +
                                                 requestLine +
-                                                " from client " + IPUtils.ipAddressToString(clientIPAddress) +
+                                                " from client " + clientIPAddress.toString() +
                                                 ". REASON: Method not implemented or undefined.",
                                                 HTTPConstants.HTTP_RESPONSE_CODES.NOT_IMPLEMENTED,
                                                 true);
@@ -48,7 +49,7 @@ public class HTTPRequest {
                 this.requestType == REQUEST_TYPE.CONNECT)
             throw new MalformedRequestException("An error occurred with request: " +
                                                 requestLine +
-                                                " from client " + IPUtils.ipAddressToString(clientIPAddress) +
+                                                " from client " + clientIPAddress.toString() +
                                                 ". REASON: Method not allowed on server.",
                                                 HTTPConstants.HTTP_RESPONSE_CODES.METHOD_NOT_ALLOWED,
                                                 true);
@@ -80,7 +81,7 @@ public class HTTPRequest {
         if(!this.httpVersion.equals("HTTP/1.1") && !this.httpVersion.equals("HTTP/1.0"))
             throw new MalformedRequestException("An error occurred with request: " +
                                                 requestLine +
-                                                " from client " + IPUtils.ipAddressToString(clientIPAddress) +
+                                                " from client " + this.clientIPAddress.toString() +
                                                 ". REASON: Protocol not supported by server.",
                                                 HTTPConstants.HTTP_RESPONSE_CODES.BAD_REQUEST,
                                                 true);
@@ -97,7 +98,7 @@ public class HTTPRequest {
         if(header.length != 2){
             throw new MalformedRequestException("An error occurred with header " +
                                                         headerLine + " from client: " +
-                                                        IPUtils.ipAddressToString(this.clientIPAddress));
+                                                        this.clientIPAddress.toString());
         }
 
         // check if we understand the header

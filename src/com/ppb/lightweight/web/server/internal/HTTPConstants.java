@@ -257,12 +257,35 @@ public class HTTPConstants {
     public static List<String> getGeneralHeadersStringList() {
         if (httpGeneralHeadersStringList == null) {
             httpGeneralHeadersStringList = new ArrayList<>();
-            for (HTTP_REQUEST_HEADERS header : HTTP_REQUEST_HEADERS.values()) {
+            for (HTTP_GENERAL_HEADERS header : HTTP_GENERAL_HEADERS.values()) {
                 httpGeneralHeadersStringList.add(header.getRepresentation());
             }
         }
 
         return httpGeneralHeadersStringList;
     }
+
+    private static List<String> httpRequestHeadersStringList = null;
+    public static List<String> getHttpRequestHeadersStringList() {
+        if (httpRequestHeadersStringList == null) {
+            httpRequestHeadersStringList = new ArrayList<>();
+            for (HTTP_REQUEST_HEADERS header : HTTP_REQUEST_HEADERS.values()) {
+                httpRequestHeadersStringList.add(header.getRepresentation());
+            }
+        }
+        return httpRequestHeadersStringList;
+    }
+
+    private static List<String> httpResponseHeaderStringList = null;
+    public static List<String> getHttpResponseHeaderStringList() {
+        if (httpResponseHeaderStringList == null) {
+            httpResponseHeaderStringList = new ArrayList<>();
+            for (HTTP_RESPONSE_HEADERS header : HTTP_RESPONSE_HEADERS.values()) {
+                httpResponseHeaderStringList.add(header.getRepresentation());
+            }
+        }
+        return httpResponseHeaderStringList;
+    }
+
 
 }

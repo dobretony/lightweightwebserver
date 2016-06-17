@@ -60,8 +60,16 @@ public class FileFactory {
      */
     public static File searchForURI(String URI){
 
-        if(URI.contains("http://")){
-            return null; // TODO: Change this behaviour.
+        // if this is not a resource on this server, then ignore and return a null File object
+        if(URI.startsWith("http://")){
+            if(Configurations.SERVER_HOSTNAME != null)
+                if(URI.contains(Configurations.SERVER_HOSTNAME)){
+                    //extract the URI resource
+                    URI = URI.replaceFirst("http://", "");
+                    URI = URI.replaceFirst(Configurations.SERVER_HOSTNAME, "");
+                }
+            // we also return null if do not have a method of determining the server host name
+            return null;
         }
 
         Path startingDirectory = Paths.get(Configurations.WWW_FOLDER_PATH);
