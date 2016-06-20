@@ -1,6 +1,7 @@
 package com.ppb.lightweight.web.server.handlers;
 
 import com.ppb.lightweight.web.server.errors.MalformedRequestException;
+import com.ppb.lightweight.web.server.internal.HTTPConstants;
 import com.ppb.lightweight.web.server.internal.HTTPRequest;
 import com.ppb.lightweight.web.server.internal.HTTPResponse;
 import com.ppb.lightweight.web.server.logger.Logger;
@@ -44,20 +45,28 @@ public class HttpHandler implements Handler{
             return;
         }
 
-        // read the first line and determine the
+        // read the first line and determine the request
         try{
             buffer = this.clientSocketReader.readLine();
             this.httpRequest = new HTTPRequest(buffer, this.clientIPAddress);
         } catch (IOException e){
+            // if we encounter a socket error, then we ignore this socket.
             Logger.logE("Error while reading from socket for client.");
+            return;
         } catch (MalformedRequestException e){
-
+            // we have identified a malformed request
+            // we close the connection gracefully
+            HTTPResponse response = HTTPResponse.getCloseMessage(
+                    Integer.parseInt(HTTPConstants.HTTP_RESPONSE_CODES.BAD_REQUEST.getRepresentation()));
+            sendResponse(response);
         }
 
 
     }
 
     public void sendResponse(HTTPResponse httpResponse){
+
+
 
     }
 

@@ -7,7 +7,7 @@ import com.ppb.lightweight.web.server.logger.Logger;
 import java.net.UnknownHostException;
 
 /**
- * Created by tony on 14.06.2016.
+ * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class LightweightWebServerMain {
 

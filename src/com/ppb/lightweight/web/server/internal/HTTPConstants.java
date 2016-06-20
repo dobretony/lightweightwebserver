@@ -287,5 +287,4 @@ public class HTTPConstants {
         return httpResponseHeaderStringList;
     }
 
-
 }

@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.util.HashMap;
 
 /**
- * Created by tony on 15.06.2016.
+ * Created by DOBRE Antonel-George on 15.06.2016.
  */
 public class HTTPRequest {
 

@@ -9,6 +9,7 @@ public class HTTPResponse {
 
     private String responseCode = null;
     private HashMap<String, String> responseHeaders = null;
+    private StringBuilder contentBuilder = null;
 
     public HTTPResponse(int responseCode){
 
@@ -17,12 +18,25 @@ public class HTTPResponse {
         builder.append(responseCode);
         this.responseCode = builder.toString();
         this.responseHeaders =  new HashMap<>();
+        this.contentBuilder = new StringBuilder();
 
     }
 
 
     public void addHeader(String header, String headerMessage){
 
+        if(!HTTPConstants.getGeneralHeadersStringList().contains(header))
+            return;
+
+        if(!HTTPConstants.getHttpResponseHeaderStringList().contains(header))
+            return;
+
+        this.responseHeaders.put(header, headerMessage);
+
+    }
+
+    public void addContentMessage(String messageLine){
+        this.contentBuilder.append(messageLine);
     }
 
     /**
@@ -38,4 +52,22 @@ public class HTTPResponse {
 
     }
 
+    public static HTTPResponse getOKMessage() {
+
+        HTTPResponse response = new HTTPResponse(Integer.parseInt(HTTPConstants.HTTP_RESPONSE_CODES.OK.getRepresentation()));
+        response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "keep-alive");
+        return response;
+
+    }
+
+
+    public String getOutput(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.responseCode);
+        for(String header : this.responseHeaders.keySet()){
+            builder.append(header + ": " + this.responseHeaders.get(header) + "\n");
+        }
+
+        return builder.toString();
+    }
 }
