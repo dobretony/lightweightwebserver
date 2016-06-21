@@ -122,24 +122,50 @@ public class HTTPRequest {
     /**
      * Method that checks if further information is needed from the client during this request.
      * (e.g. "Transfer-Encoding: chunked" header is present)
-     * TODO: get all possible cases
+     *
      * @return
      */
     public boolean doContinue(){
-        if(this.headers.keySet().contains(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation())){
-            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation()).
-                    equals("chunked")){
-                return true;
+        boolean cont = false;
+
+        if(this.headers.keySet().contains(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation())){
+            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation())
+                    .equals("keep-alive")){
+                cont = true;
             }
+        }
+
+        if(this.headers.keySet().contains(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation())){
+            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation())
+                    .equals("chunked")){
+                cont =  true;
+            }
+        }
+
+        return cont;
+    }
+
+    public boolean hasKeepAlive(){
+        if(this.headers.containsKey(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation())){
+            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation()).equals("keep-alive"))
+                return true;
         }
         return false;
     }
 
-    /**
-     * Signals if the request stated a connection close to the server.
-     * @return
-     */
-    public boolean closeConnection(){
-        return this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation()).equals("close");
+    public String getRequestURI(){
+        return this.requestURI;
     }
+
+    public boolean hasHeader(String header){
+        if(this.headers.containsKey(header)){
+            return true;
+        }
+        return false;
+    }
+
+    public String getHeaderValue(String header){
+        return this.headers.get(header);
+    }
+
 }

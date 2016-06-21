@@ -9,5 +9,6 @@ public class Constants {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd-HH:mm:ss";
     public static final String DEFAULT_WWW_FOLDER_PATH = "www";
     public static final int DEFAULT_ACTIVE_CONNECTIONS = 0;
+    public static final int DEFAULT_CLIENT_SOCKET_TIMEOUT = 100000;
 
 }

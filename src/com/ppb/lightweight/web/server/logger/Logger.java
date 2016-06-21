@@ -6,6 +6,7 @@ import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
 import com.ppb.lightweight.web.server.utils.Configurations;
 import com.ppb.lightweight.web.server.utils.Constants;
 import com.ppb.lightweight.web.server.utils.Utils;
+import sun.rmi.runtime.Log;
 
 /**
  * Created by tony on 14.06.2016.
@@ -119,6 +120,23 @@ public class Logger {
         sb.append(Utils.getCurrentTimestampString());
         sb.append(" " + Logger.VERBOSE_SPECIFIER);
         sb.append(" " + message);
+
+        Logger.logger.out.println(sb.toString());
+    }
+
+
+    public static void logE(Exception e){
+        if(Logger.logger == null)
+            return;
+
+        StackTraceElement[] elements = e.getStackTrace();
+        StringBuilder sb = new StringBuilder();
+        for(StackTraceElement element : elements) {
+            sb.append(Utils.getCurrentTimestampString());
+            sb.append(" " + Logger.ERROR_SPECIFIER);
+            sb.append(" " + element.toString());
+            sb.append("\n");
+        }
 
         Logger.logger.out.println(sb.toString());
     }

@@ -1,5 +1,12 @@
 package com.ppb.lightweight.web.server.internal;
 
+import com.ppb.lightweight.web.server.errors.InternalServerError;
+import com.ppb.lightweight.web.server.logger.Logger;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 /**
@@ -9,17 +16,23 @@ public class HTTPResponse {
 
     private String responseCode = null;
     private HashMap<String, String> responseHeaders = null;
-    private StringBuilder contentBuilder = null;
+    private WebServerFile resource = null;
+    private int contentLength = 0;
 
-    public HTTPResponse(int responseCode){
+    public HTTPResponse(String responseCode){
 
         StringBuilder builder = new StringBuilder();
         builder.append("HTTP/1.1 ");
         builder.append(responseCode);
+        builder.append(" ");
+        builder.append(" \n");
         this.responseCode = builder.toString();
         this.responseHeaders =  new HashMap<>();
-        this.contentBuilder = new StringBuilder();
 
+    }
+
+    public HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES code){
+        this(code.getRepresentation());
     }
 
 
@@ -35,8 +48,8 @@ public class HTTPResponse {
 
     }
 
-    public void addContentMessage(String messageLine){
-        this.contentBuilder.append(messageLine);
+    public void setResource(WebServerFile file){
+        this.resource = file;
     }
 
     /**
@@ -44,7 +57,7 @@ public class HTTPResponse {
      *
      * @return
      */
-    public static HTTPResponse getCloseMessage(int errCode){
+    public static HTTPResponse getCloseMessage(String errCode){
 
         HTTPResponse response = new HTTPResponse(errCode);
         response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "close" );
@@ -54,20 +67,67 @@ public class HTTPResponse {
 
     public static HTTPResponse getOKMessage() {
 
-        HTTPResponse response = new HTTPResponse(Integer.parseInt(HTTPConstants.HTTP_RESPONSE_CODES.OK.getRepresentation()));
+        HTTPResponse response = new HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES.OK.getRepresentation());
         response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "keep-alive");
         return response;
 
     }
 
 
-    public String getOutput(){
+    /**
+     * The toString() method returns all the HTTP Response headers in a format that can be sent through a client Socket.
+     *
+     * @return
+     */
+    @Override
+    public String toString(){
         StringBuilder builder = new StringBuilder();
         builder.append(this.responseCode);
+        builder.append("\n");
         for(String header : this.responseHeaders.keySet()){
-            builder.append(header + ": " + this.responseHeaders.get(header) + "\n");
+            builder.append(header);
+            builder.append(": ");
+            builder.append(this.responseHeaders.get(header));
+            builder.append("\n");
         }
+        if(this.hasResource()){
+            builder.append(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH);
+            builder.append(": ");
+            builder.append(this.resource.length());
+            builder.append("\n");
+        }
+
+        builder.append("\n");
 
         return builder.toString();
     }
+
+    public boolean hasResource(){
+        return !(this.resource == null);
+    }
+
+    public FileInputStream getResourceContent() throws InternalServerError{
+
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(this.resource);
+        } catch(FileNotFoundException e){
+            Logger.logE("Could not find a requested resource: " + this.resource.getAbsolutePath());
+            Logger.logE(e);
+            throw new InternalServerError("Error while finding resource.");
+        }
+
+        return inputStream;
+    }
+
+    /**
+     * Checks to see if the HTTPResponse is an OK message.
+     * Returns true if the response code is 200 (OK), false otherwise.
+     *
+     * @return
+     */
+    public boolean isOK(){
+        return this.responseCode.contains("200");
+    }
+
 }

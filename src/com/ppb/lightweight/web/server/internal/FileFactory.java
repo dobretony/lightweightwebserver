@@ -58,7 +58,7 @@ public class FileFactory {
      * @param URI
      * @return
      */
-    public static File searchForURI(String URI){
+    public static WebServerFile searchForURI(String URI){
 
         // if this is not a resource on this server, then ignore and return a null File object
         if(URI.startsWith("http://")){
@@ -75,56 +75,13 @@ public class FileFactory {
         Path startingDirectory = Paths.get(Configurations.WWW_FOLDER_PATH);
         Path fileToFind = Paths.get(startingDirectory.toUri() + URI);
 
-        File file = fileToFind.toFile();
+        WebServerFile file = new WebServerFile(fileToFind.toFile());
         if(!file.exists())
            return null;
         else if(!file.canRead())
            return null;
 
         return file;
-    }
-
-}
-
-class FileFinder extends SimpleFileVisitor<Path> {
-
-    private Path resource = null;
-    private boolean found = false;
-
-    public FileFinder(Path URI){
-        this.resource = URI;
-    }
-
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attr){
-        if(file.compareTo(this.resource) == 0) {
-            if(attr.isSymbolicLink())
-                this.found = false;
-            else
-                this.found = true;
-            return TERMINATE;
-        }
-        else
-            return CONTINUE;
-    }
-
-    @Override
-    public FileVisitResult postVisitDirectory(Path dir,
-                                              IOException exc) {
-        if(dir.compareTo(this.resource) == 0){
-            this.found = true;
-            return TERMINATE;
-        }
-
-        return CONTINUE;
-    }
-
-    public Path getPath(){
-        return this.resource;
-    }
-
-    public boolean fileWasFound(){
-        return this.found;
     }
 
 }

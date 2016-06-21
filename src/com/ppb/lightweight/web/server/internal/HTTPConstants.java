@@ -124,7 +124,7 @@ public class HTTPConstants {
             this.headerString = headerString;
         }
 
-        String getRepresentation(){
+        public String getRepresentation(){
             return this.headerString;
         }
 
@@ -154,7 +154,7 @@ public class HTTPConstants {
             this.headerString = headerString;
         }
 
-        String getRepresentation(){
+        public String getRepresentation(){
             return this.headerString;
         }
 
@@ -184,7 +184,7 @@ public class HTTPConstants {
             this.headerString = headerString;
         }
 
-        String getRepresentation(){
+        public String getRepresentation(){
             return this.headerString;
         }
 
