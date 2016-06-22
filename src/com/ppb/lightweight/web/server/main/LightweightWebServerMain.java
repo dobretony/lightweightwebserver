@@ -1,6 +1,7 @@
 package com.ppb.lightweight.web.server.main;
 
 import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
+import com.ppb.lightweight.web.server.internal.FileFactory;
 import com.ppb.lightweight.web.server.internal.LightweightWebServer;
 import com.ppb.lightweight.web.server.logger.Logger;
 
@@ -18,6 +19,10 @@ public class LightweightWebServerMain {
         try{
             // initialize Logger
             Logger.initializeLogger();
+            // initialize FileSystem
+            FileFactory.initializeFileSystem();
+
+            // get an instance of the server
             LightweightWebServer webServer = new LightweightWebServer("10.237.104.147", 8080, 50);
             webServer.run();
 

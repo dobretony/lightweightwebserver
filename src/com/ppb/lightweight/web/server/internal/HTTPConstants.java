@@ -249,6 +249,9 @@ public class HTTPConstants {
         public String getRepresentation() {
             return representation;
         }
+        public int getCode() {
+            return this.code;
+        }
     }
 
     // a list containing the string representation of HTTP GENERAL HEADER Enumeration

@@ -25,23 +25,35 @@ public class HTTPResponse {
         builder.append("HTTP/1.1 ");
         builder.append(responseCode);
         builder.append(" ");
-        builder.append(" \n");
+        builder.append(" \r\n");
         this.responseCode = builder.toString();
         this.responseHeaders =  new HashMap<>();
 
     }
 
-    public HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES code){
-        this(code.getRepresentation());
+    public HTTPResponse(String responseCode, String reason){
+        StringBuilder builder = new StringBuilder();
+        builder.append("HTTP/1.1 ");
+        builder.append(responseCode);
+        builder.append(" ");
+        builder.append(reason);
+        builder.append(" \r\n");
+        this.responseCode = builder.toString();
+        this.responseHeaders =  new HashMap<>();
     }
 
+    public HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES code){
+        this(String.format("%d", code.getCode()));
+    }
+
+    public HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES code, String reason){
+        this(String.format("%d", code.getCode()), reason);
+    }
 
     public void addHeader(String header, String headerMessage){
 
-        if(!HTTPConstants.getGeneralHeadersStringList().contains(header))
-            return;
-
-        if(!HTTPConstants.getHttpResponseHeaderStringList().contains(header))
+        if(!HTTPConstants.getGeneralHeadersStringList().contains(header) &&
+                !HTTPConstants.getHttpResponseHeaderStringList().contains(header))
             return;
 
         this.responseHeaders.put(header, headerMessage);
@@ -57,10 +69,10 @@ public class HTTPResponse {
      *
      * @return
      */
-    public static HTTPResponse getCloseMessage(String errCode){
+    public static HTTPResponse getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES errCode){
 
-        HTTPResponse response = new HTTPResponse(errCode);
-        response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "close" );
+        HTTPResponse response = new HTTPResponse(errCode, errCode.getRepresentation());
+        response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "close");
         return response;
 
     }
@@ -83,21 +95,21 @@ public class HTTPResponse {
     public String toString(){
         StringBuilder builder = new StringBuilder();
         builder.append(this.responseCode);
-        builder.append("\n");
+        builder.append("\r\n");
         for(String header : this.responseHeaders.keySet()){
             builder.append(header);
             builder.append(": ");
             builder.append(this.responseHeaders.get(header));
-            builder.append("\n");
+            builder.append("\r\n");
         }
         if(this.hasResource()){
             builder.append(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH);
             builder.append(": ");
             builder.append(this.resource.length());
-            builder.append("\n");
+            builder.append("\r\n");
         }
 
-        builder.append("\n");
+        builder.append("\r\n");
 
         return builder.toString();
     }

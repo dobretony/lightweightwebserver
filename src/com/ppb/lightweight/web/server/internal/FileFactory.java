@@ -68,7 +68,26 @@ public class FileFactory {
                     URI = URI.replaceFirst("http://", "");
                     URI = URI.replaceFirst(Configurations.SERVER_HOSTNAME, "");
                 }
-            // we also return null if do not have a method of determining the server host name
+            else
+                // we also return null if do not have a method of determining the server host name
+                return null;
+        }
+
+        // remove leading / from filename
+        while(URI.indexOf("/") == 0){
+            URI = URI.substring(1);
+        }
+
+        // if after removing the leading "/" we have a length of 0, then we display index.html page
+        if(URI.length() == 0){
+            URI += "index.html";
+        }
+
+        // replace "/" with the Files.pathSeparator
+        URI=URI.replace("/", File.pathSeparator);
+
+        // check to see if the URI has illegal characters to prevent access to super directories
+        if(URI.contains("..") || URI.contains(":") || URI.contains("|")){
             return null;
         }
 

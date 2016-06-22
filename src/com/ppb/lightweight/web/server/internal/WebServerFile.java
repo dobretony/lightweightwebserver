@@ -4,7 +4,12 @@ import com.ppb.lightweight.web.server.errors.MalformedRequestException;
 import com.ppb.lightweight.web.server.logger.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.spi.FileTypeDetector;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,6 +67,29 @@ public class WebServerFile extends File {
             throw new MalformedRequestException("There was a parse exception in the last modified since header of a request.");
         }
 
+    }
+
+    /**
+     * Returns a String containing the content type that should be specified
+     * in the HTTP Response header field Content-type.
+     *
+     * The type is determined by utilizing Files.probeContentType(filePath), which should
+     * return the MIME type of this WebServerFile.
+     *
+     * @return
+     */
+    public String getContentType(){
+        String type;
+        Path filePath = FileSystems.getDefault().getPath(this.getAbsolutePath());
+        try {
+            type = Files.probeContentType(filePath);
+            if(type == null)
+                type = "";
+        } catch(IOException e){
+            Logger.logE("Could not correctly determine content type of file " + filePath.toString() + ".");
+            type = "";
+        }
+        return type;
     }
 
 }

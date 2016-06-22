@@ -10,5 +10,5 @@ public class Constants {
     public static final String DEFAULT_WWW_FOLDER_PATH = "www";
     public static final int DEFAULT_ACTIVE_CONNECTIONS = 0;
     public static final int DEFAULT_CLIENT_SOCKET_TIMEOUT = 100000;
-
+    public static final int DEFAULT_MAX_LENGTH_OF_REQUEST_CONTENT = 1000000;
 }

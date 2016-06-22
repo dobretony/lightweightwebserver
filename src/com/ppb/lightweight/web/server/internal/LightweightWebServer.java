@@ -1,6 +1,7 @@
 package com.ppb.lightweight.web.server.internal;
 
 import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
+import com.ppb.lightweight.web.server.handlers.HTTPHandler;
 import com.ppb.lightweight.web.server.handlers.HandlerFactory;
 import com.ppb.lightweight.web.server.logger.Logger;
 
@@ -68,6 +69,7 @@ public class LightweightWebServer {
         while(isRunning){
             try {
                 Socket clientSocket = this.serverSocket.accept();
+                Logger.logD("Accepted a socket from client: " + clientSocket.getInetAddress().toString());
                 // here we relinquish the client socket to a handler, once we find out what it wants.
                 handleRequest(clientSocket);
             }catch(IOException e){
@@ -79,52 +81,8 @@ public class LightweightWebServer {
 
     private void handleRequest(Socket clientSocket){
 
-        //////// TEST CODE from http://techwiki.ordak.org/
-        BufferedReader is;
-        PrintWriter os;
-        String request;
-
-        try{
-            String webServerAddress = clientSocket.getInetAddress().toString();
-            Logger.log("Accepted connection from " + webServerAddress);
-            is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            //request = is.readLine();
-            //Logger.log("Server received request from client: " + request);
-
-            while ( (request = is.readLine()) != null){
-                System.out.println("Message: " + request);
-            }
-
-            os = new PrintWriter(clientSocket.getOutputStream(), true);
-            os.println("HTTP/1.1 200");
-            os.println("Content-type: text/html");
-            os.println("Server-name: myserver");
-            String response = "<html><head>" +
-                    "<title>Simpl Web Page</title></head>\n" +
-                    "<h1>Congratulations!!!</h1>\n" +
-                    "<h3>This page was returned by " + webServerAddress + "</h3>\n" +
-                    "<p>This is the first page hosted by your web server.\n</p>" +
-                    "Visit <A HREF=\"http://www.techwiki.ordak.org\"> http://www.techwiki.ordak.org</A> for more sample codes.\n" +
-                    "</html>\n";
-            os.println("Content-length: " + response.length(  ));
-            os.println("");
-            os.println(response);
-            os.flush();
-            os.close();
-            clientSocket.close();
-        } catch (IOException e) {
-            System.out.println("Failed to send response to client: " + e.getMessage());
-        } finally {
-            if(clientSocket != null) {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return;
+        HTTPHandler handler = new HTTPHandler(clientSocket);
+        this.threadPool.submit(handler);
 
     }
 

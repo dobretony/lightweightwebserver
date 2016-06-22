@@ -17,6 +17,7 @@ public class HTTPRequest {
     private String requestURI = null;
     private String httpVersion = null;
     private InetAddress clientIPAddress = null;
+    private char[] content = null;
 
     public HTTPRequest(String requestLine, InetAddress clientIPAddress) throws MalformedRequestException {
         String[] requests = requestLine.split(" ");
@@ -93,20 +94,15 @@ public class HTTPRequest {
 
     public void addHeader(String headerLine) throws MalformedRequestException {
 
-        String[] header = headerLine.split(":");
-
-        if(header.length != 2){
-            throw new MalformedRequestException("An error occurred with header " +
-                                                        headerLine + " from client: " +
-                                                        this.clientIPAddress.toString());
-        }
+        String[] header = headerLine.split(":", 2);
 
         // check if we understand the header
         // we ignore the header if we do not understand it
         // this behaviour might change in future implementations
-        if(HTTPConstants.getGeneralHeadersStringList().contains(header[0])) {
+        if(HTTPConstants.getGeneralHeadersStringList().contains(header[0]) ||
+                HTTPConstants.getHttpRequestHeadersStringList().contains(header[0])) {
             // we will check individual header integrity as the need arises for that header
-            this.headers.put(header[0], header[1]);
+            this.headers.put(header[0].trim(), header[1].trim());
         }
 
     }
@@ -126,23 +122,7 @@ public class HTTPRequest {
      * @return
      */
     public boolean doContinue(){
-        boolean cont = false;
-
-        if(this.headers.keySet().contains(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation())){
-            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation())
-                    .equals("keep-alive")){
-                cont = true;
-            }
-        }
-
-        if(this.headers.keySet().contains(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation())){
-            if(this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.TRANSFER_ENCODING.getRepresentation())
-                    .equals("chunked")){
-                cont =  true;
-            }
-        }
-
-        return cont;
+        return !this.headers.get(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation()).equals("close");
     }
 
     public boolean hasKeepAlive(){
@@ -158,14 +138,57 @@ public class HTTPRequest {
     }
 
     public boolean hasHeader(String header){
-        if(this.headers.containsKey(header)){
-            return true;
-        }
-        return false;
+        return this.headers.containsKey(header);
     }
 
     public String getHeaderValue(String header){
         return this.headers.get(header);
+    }
+
+    public void setContent(char[] buffer){
+        this.content = buffer;
+    }
+
+    public boolean hasContent(){
+        return this.headers.containsKey(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH.getRepresentation());
+    }
+
+    /**
+     * Returns the content length presented in the header file of this socket.
+     * This value represents the number of bytes that should be read from the client socket.
+     *
+     * @return
+     */
+    public int getContentLength(){
+        if(!this.hasContent())
+            return 0;
+        return Integer.parseInt(this.headers.get(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH.getRepresentation()));
+    }
+
+    /**
+     * Returns a String representation of this class.
+     *
+     * In this case, it returns the method and headers received from the client.
+     *
+     * @return
+     */
+    @Override
+    public String toString(){
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(this.requestType);
+        builder.append(" ");
+        builder.append(this.requestURI);
+        builder.append(" ");
+        builder.append(this.httpVersion);
+        builder.append("\r\n");
+
+        for(String value : this.headers.keySet()){
+            builder.append(value + ": " + this.headers.get(value) + "\r\n");
+        }
+
+        return builder.toString();
     }
 
 }

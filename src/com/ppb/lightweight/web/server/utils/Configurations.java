@@ -14,4 +14,5 @@ public class Configurations {
     public static int CLIENT_SOCKET_TIMEOUT = Constants.DEFAULT_CLIENT_SOCKET_TIMEOUT;
 
     public static int NO_OF_ACTIVE_CONN = Constants.DEFAULT_ACTIVE_CONNECTIONS;
+    public static int MAX_LENGTH_OF_REQUEST_CONTENT = Constants.DEFAULT_MAX_LENGTH_OF_REQUEST_CONTENT;
 }

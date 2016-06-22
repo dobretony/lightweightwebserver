@@ -63,7 +63,8 @@ public class Logger {
         }
 
         // initialize the Logger class
-        Logger.logger = new Logger(logfile.getAbsolutePath());
+        //Logger.logger = new Logger(logfile.getAbsolutePath());
+        Logger.logger = new Logger(null);
 
     }
 
