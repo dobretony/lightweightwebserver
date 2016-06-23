@@ -141,7 +141,7 @@ public class HTTPHandler implements Handler{
 
     private void sendResponse(HTTPResponse httpResponse){
 
-        FileInputStream input = null;
+        FileReader input = null;
         if(httpResponse.hasResource()){
             try{
                 input = httpResponse.getResourceContent();
@@ -162,9 +162,10 @@ public class HTTPHandler implements Handler{
         // print the content, if it has any
         if(httpResponse.hasResource()){
             try {
-                int c;
-                while ((c = input.read()) != -1) {
-                    this.clientSocketWriter.write(c);
+                // we read and write to sockets in segments of 4096, in order to not overthrow memory.
+                char[] buff = new char[4096];
+                while(input.read(buff) != -1){
+                    this.clientSocketWriter.write(buff);
                 }
             } catch(IOException e){
                 Logger.logE("Could not read from a requested resource. " +
@@ -237,8 +238,13 @@ public class HTTPHandler implements Handler{
         String lastUnmodifiedSince = HTTPConstants.HTTP_REQUEST_HEADERS.IF_UNMODIFIED_SINCE.getRepresentation();
 
         if(file == null){
-            // return an error HTTPResponse
-            return HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.NOT_FOUND);
+            // create and return an error HTTPResponse
+            response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.NOT_FOUND);
+            response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_TYPE.getRepresentation(), "plain/html");
+            // find the File Not Found file
+            file = FileFactory.getFileNotFound();
+            response.setResource(file);
+            return response;
         }
 
         // if the resource was found, we check to see if this is a conditional GET
@@ -308,11 +314,11 @@ public class HTTPHandler implements Handler{
         // send the client a HTTP response with 301 (Moved Permenently) with the correct "/" appended
         if(file.isDirectory()){
             String uri = this.httpRequest.getRequestURI();
-            uri = uri.replace("/", File.pathSeparator);
-            if(uri.lastIndexOf(File.pathSeparator) != (uri.length()-1)){
+            uri = uri.replace("/", File.separator);
+            if(uri.lastIndexOf(File.separator) != (uri.length()-1)){
                 response = new HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES.MOVED_PERMANENTLY, "Moved Permanently");
                 response.addHeader(HTTPConstants.HTTP_RESPONSE_HEADERS.LOCATION.getRepresentation(),
-                        "/" + this.httpRequest.getRequestURI() + File.pathSeparator);
+                        "/" + this.httpRequest.getRequestURI() + File.separator);
                 return response;
             }
         }

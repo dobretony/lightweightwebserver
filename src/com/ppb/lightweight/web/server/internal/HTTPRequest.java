@@ -100,7 +100,8 @@ public class HTTPRequest {
         // we ignore the header if we do not understand it
         // this behaviour might change in future implementations
         if(HTTPConstants.getGeneralHeadersStringList().contains(header[0]) ||
-                HTTPConstants.getHttpRequestHeadersStringList().contains(header[0])) {
+                HTTPConstants.getHttpRequestHeadersStringList().contains(header[0]) ||
+                HTTPConstants.getHttpEntityHeaderStringList().contains(header[0])) {
             // we will check individual header integrity as the need arises for that header
             this.headers.put(header[0].trim(), header[1].trim());
         }

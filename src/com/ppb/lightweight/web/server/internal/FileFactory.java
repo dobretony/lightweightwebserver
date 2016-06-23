@@ -6,6 +6,7 @@ import com.ppb.lightweight.web.server.utils.Configurations;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
@@ -84,21 +85,45 @@ public class FileFactory {
         }
 
         // replace "/" with the Files.pathSeparator
-        URI=URI.replace("/", File.pathSeparator);
+        URI=URI.replace("/", File.separator);
 
         // check to see if the URI has illegal characters to prevent access to super directories
         if(URI.contains("..") || URI.contains(":") || URI.contains("|")){
             return null;
         }
 
-        Path startingDirectory = Paths.get(Configurations.WWW_FOLDER_PATH);
-        Path fileToFind = Paths.get(startingDirectory.toUri() + URI);
+        WebServerFile file = new WebServerFile(Configurations.WWW_FOLDER_PATH + File.separator + URI);
 
-        WebServerFile file = new WebServerFile(fileToFind.toFile());
-        if(!file.exists())
-           return null;
-        else if(!file.canRead())
-           return null;
+        if(!file.exists()){
+            return null;
+        }
+
+        if(!file.canRead()){
+            return null;
+        }
+
+        return file;
+    }
+
+    public static WebServerFile getFileNotFound(){
+        WebServerFile file = null;
+        if(Configurations.FILE_NOT_FOUND_MESSAGE_FILE != null){
+            file = new WebServerFile(Configurations.FILE_NOT_FOUND_MESSAGE_FILE);
+        }else{
+            // if a file not found message file was not configured, then create a temporary file and set that one
+            try {
+                File tempFile = File.createTempFile("File Not Found", ".html");
+                PrintWriter writer = new PrintWriter(tempFile);
+                writer.print("<html>" +
+                        "<head><title>File not Found</title></head>" +
+                        "<body><font size=\"36\"><b> This is not the file you are looking for! </b></font> </body>" +
+                        "</html>\n");
+                writer.close();
+                file = new WebServerFile(tempFile);
+            } catch(IOException e){
+                Logger.logE("Could not create or write to a temporary file for FileNotFound message.");
+            }
+        }
 
         return file;
     }

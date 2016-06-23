@@ -6,6 +6,7 @@ import com.ppb.lightweight.web.server.logger.Logger;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.nio.file.Files;
 import java.util.HashMap;
 
@@ -53,8 +54,10 @@ public class HTTPResponse {
     public void addHeader(String header, String headerMessage){
 
         if(!HTTPConstants.getGeneralHeadersStringList().contains(header) &&
-                !HTTPConstants.getHttpResponseHeaderStringList().contains(header))
+                !HTTPConstants.getHttpResponseHeaderStringList().contains(header) &&
+                !HTTPConstants.getHttpEntityHeaderStringList().contains(header)) {
             return;
+        }
 
         this.responseHeaders.put(header, headerMessage);
 
@@ -79,7 +82,7 @@ public class HTTPResponse {
 
     public static HTTPResponse getOKMessage() {
 
-        HTTPResponse response = new HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES.OK.getRepresentation());
+        HTTPResponse response = new HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES.OK);
         response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "keep-alive");
         return response;
 
@@ -95,7 +98,6 @@ public class HTTPResponse {
     public String toString(){
         StringBuilder builder = new StringBuilder();
         builder.append(this.responseCode);
-        builder.append("\r\n");
         for(String header : this.responseHeaders.keySet()){
             builder.append(header);
             builder.append(": ");
@@ -103,7 +105,7 @@ public class HTTPResponse {
             builder.append("\r\n");
         }
         if(this.hasResource()){
-            builder.append(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH);
+            builder.append(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH.getRepresentation());
             builder.append(": ");
             builder.append(this.resource.length());
             builder.append("\r\n");
@@ -118,11 +120,18 @@ public class HTTPResponse {
         return !(this.resource == null);
     }
 
-    public FileInputStream getResourceContent() throws InternalServerError{
+    public long getContentLength(){
+        if(this.hasResource()){
+            return this.resource.length();
+        }
+        return 0;
+    }
 
-        FileInputStream inputStream = null;
+    public FileReader getResourceContent() throws InternalServerError{
+
+        FileReader inputStream = null;
         try {
-            inputStream = new FileInputStream(this.resource);
+            inputStream = new FileReader(this.resource);
         } catch(FileNotFoundException e){
             Logger.logE("Could not find a requested resource: " + this.resource.getAbsolutePath());
             Logger.logE(e);

@@ -73,7 +73,7 @@ public class Logger {
         Logger.logger.out.close();
     }
 
-    public static void log(String message){
+    public static synchronized void log(String message){
 
         if(Logger.logger == null)
             return;
@@ -86,7 +86,7 @@ public class Logger {
         Logger.logger.out.println(sb.toString());
     }
 
-    public static void logE(String message){
+    public static synchronized void logE(String message){
 
         if(Logger.logger == null)
             return;
@@ -99,7 +99,7 @@ public class Logger {
         Logger.logger.out.println(sb.toString());
     }
 
-    public static void logD(String message){
+    public static synchronized void logD(String message){
 
         if(Logger.logger == null)
             return;
@@ -112,7 +112,7 @@ public class Logger {
         Logger.logger.out.println(sb.toString());
     }
 
-    public static void logV(String message){
+    public static synchronized void logV(String message){
 
         if(Logger.logger == null)
             return;
@@ -126,7 +126,7 @@ public class Logger {
     }
 
 
-    public static void logE(Exception e){
+    public static synchronized void logE(Exception e){
         if(Logger.logger == null)
             return;
 
@@ -146,7 +146,7 @@ public class Logger {
      * Outputs to terminal.
      * @param message
      */
-    public static void outputWrite(String message){
+    public static synchronized void outputWrite(String message){
 
         System.out.println(message);
 

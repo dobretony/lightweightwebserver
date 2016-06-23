@@ -290,4 +290,15 @@ public class HTTPConstants {
         return httpResponseHeaderStringList;
     }
 
+    private static List<String> httpEntityHeaderStringList = null;
+    public static List<String> getHttpEntityHeaderStringList(){
+        if(httpEntityHeaderStringList == null) {
+            httpEntityHeaderStringList = new ArrayList<>();
+            for (HTTP_ENTITY_HEADERS header : HTTP_ENTITY_HEADERS.values()) {
+                httpEntityHeaderStringList.add(header.getRepresentation());
+            }
+        }
+        return httpEntityHeaderStringList;
+    }
+
 }
