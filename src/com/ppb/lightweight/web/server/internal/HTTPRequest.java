@@ -1,11 +1,13 @@
 package com.ppb.lightweight.web.server.internal;
 
+import com.ppb.lightweight.web.server.errors.InternalServerError;
 import com.ppb.lightweight.web.server.errors.MalformedRequestException;
 import com.ppb.lightweight.web.server.utils.IPUtils;
 import com.ppb.lightweight.web.server.internal.HTTPConstants.REQUEST_TYPE;
 
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Created by DOBRE Antonel-George on 15.06.2016.
@@ -18,9 +20,12 @@ public class HTTPRequest {
     private String httpVersion = null;
     private InetAddress clientIPAddress = null;
     private char[] content = null;
+    private HashMap<String, String> requestParams = null;
+    private String fragment = null;
 
     public HTTPRequest(String requestLine, InetAddress clientIPAddress) throws MalformedRequestException {
         String[] requests = requestLine.split(" ");
+        this.requestParams = new HashMap<>();
 
         // check if request line was parsed ok and is valid
         if(requests.length != 3)
@@ -44,10 +49,7 @@ public class HTTPRequest {
                                                 true);
 
         // at the moment, the server does not allow DELETE, PUT, TRACE or CONNECT operations
-        if(this.requestType == REQUEST_TYPE.DELETE ||
-                this.requestType == REQUEST_TYPE.PUT ||
-                this.requestType == REQUEST_TYPE.TRACE ||
-                this.requestType == REQUEST_TYPE.CONNECT)
+        if(!HTTPConstants.ALLOWED_OPTIONS.contains(this.requestType))
             throw new MalformedRequestException("An error occurred with request: " +
                                                 requestLine +
                                                 " from client " + clientIPAddress.toString() +
@@ -62,9 +64,25 @@ public class HTTPRequest {
 
         // check if requestURI is valid
         // request URI can either be * | absoluteURI | abs_path | authority
+        // details can be found at https://tools.ietf.org/html/rfc3986#section-3
         switch(this.requestType){
-            case GET:
+            case GET: {
+                if (this.requestURI.contains("?")) {
+                    String[] splittedURI = this.requestURI.split("\\?", 2);
+                    this.requestURI = splittedURI[0];
+                    for (String paramCombo : splittedURI[1].split("&")) {
+                        if(paramCombo.contains("#")){
+                            // this is a special case fragment, usually contained in the last parameter
+                            String[] aux = paramCombo.split("#", 2);
+                            paramCombo = aux[0];
+                            this.fragment = aux[1];
+                        }
+                        String[] params = paramCombo.split("=", 2);
+                        this.requestParams.put(params[0], params[1]);
+                    }
+                }
                 break;
+            }
             case POST:
                 break;
             case OPTIONS:
@@ -154,6 +172,20 @@ public class HTTPRequest {
         return this.headers.containsKey(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH.getRepresentation());
     }
 
+    public String getRequestParam(String parameter){
+        if(this.requestParams.containsKey(parameter)){
+            return this.requestParams.get(parameter);
+        }
+        return null;
+    }
+
+    public String getRequestParam(String parameter, String defaultValue){
+        if(this.requestParams.containsKey(parameter)){
+            return this.requestParams.get(parameter);
+        }
+        return defaultValue;
+    }
+
     /**
      * Returns the content length presented in the header file of this socket.
      * This value represents the number of bytes that should be read from the client socket.
@@ -164,6 +196,55 @@ public class HTTPRequest {
         if(!this.hasContent())
             return 0;
         return Integer.parseInt(this.headers.get(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_LENGTH.getRepresentation()));
+    }
+
+    /**
+     * Returns the fragment part of the URI associated with this request.
+     *
+     * @return
+     */
+    public String getFragment(){
+        return this.fragment;
+    }
+
+    /**
+     * This method parses the parameters content of a POST request.
+     *
+     * This method is needed because in POST requests, the parameter String is not sent in the URI,
+     * but in the content of the request, and as such we need to have the full request before we can
+     * fully parse them.
+     */
+    public void parsePOSTParameters() throws InternalServerError{
+
+        if(this.requestType == REQUEST_TYPE.POST){
+            String contentType = null;
+            if(this.hasContent()){
+                if((contentType = this.headers.get(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_ENCODING.
+                        getRepresentation())) != null){
+                    if(contentType.equals("application/x-www-form-urlencoded")){
+                        // the POST request contains parameters
+                        String content = new String(this.content);
+                        for (String paramCombo : content.split("&")) {
+                            if(paramCombo.contains("#")){
+                                // this is a special case fragment, usually contained in the last parameter
+                                String[] aux = paramCombo.split("#", 2);
+                                paramCombo = aux[0];
+                                this.fragment = aux[1];
+                            }
+                            String[] params = paramCombo.split("=", 2);
+                            this.requestParams.put(params[0], params[1]);
+                        }
+                    }else if(contentType.equals("application/json")){
+                        // The post contains content with json, that can be handled by the application
+                    }else {
+                        // The server does not recognize any other content type for POST requests
+                        throw new InternalServerError("Server does not support current media type for POST.");
+                    }
+                }
+            }
+
+        }
+
     }
 
     /**

@@ -10,6 +10,9 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by DOBRE Antonel-George on 14.06.2016.
@@ -141,35 +144,18 @@ public class HTTPHandler implements Handler{
 
     private void sendResponse(HTTPResponse httpResponse){
 
-        FileReader input = null;
-        if(httpResponse.hasResource()){
-            try{
-                input = httpResponse.getResourceContent();
-            }catch(InternalServerError e){
-                // we could not read from the content provided, so we close gracefully
-                Logger.logE("Could not open the resource for reading.");
-                sendResponse(HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.
-                        INTERNAL_SERVER_ERROR));
-                closeConnection();
-                return;
-            }
-        }
-
         // print the headers
         System.out.println("Sending a response to client " + this.clientIPAddress);
         this.clientSocketWriter.print(httpResponse.toString());
+        this.clientSocketWriter.flush();
 
-        // print the content, if it has any
+        // If the response has a resource, then copy that file over to the client output stream
         if(httpResponse.hasResource()){
             try {
-                // we read and write to sockets in segments of 4096, in order to not overthrow memory.
-                char[] buff = new char[4096];
-                while(input.read(buff) != -1){
-                    this.clientSocketWriter.write(buff);
-                }
+                Files.copy(httpResponse.getResource().toPath(), this.clientSocket.getOutputStream());
+                this.clientSocket.getOutputStream().flush();
             } catch(IOException e){
-                Logger.logE("Could not read from a requested resource. " +
-                        "The client may have received an incomplete request.");
+                Logger.logE("Could not send full response to client: " + this.clientIPAddress);
             }
         }
 
@@ -240,6 +226,8 @@ public class HTTPHandler implements Handler{
         if(file == null){
             // create and return an error HTTPResponse
             response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.NOT_FOUND);
+            String today = new SimpleDateFormat(HTTPConstants.RFC1123_DATE_FORMAT).format(new Date());
+            response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.DATE.getRepresentation(), today);
             response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_TYPE.getRepresentation(), "plain/html");
             // find the File Not Found file
             file = FileFactory.getFileNotFound();
@@ -313,6 +301,7 @@ public class HTTPHandler implements Handler{
         // if the requested resource is a directory and is missing the trailing "/"
         // send the client a HTTP response with 301 (Moved Permenently) with the correct "/" appended
         if(file.isDirectory()){
+
             String uri = this.httpRequest.getRequestURI();
             uri = uri.replace("/", File.separator);
             if(uri.lastIndexOf(File.separator) != (uri.length()-1)){
@@ -321,6 +310,10 @@ public class HTTPHandler implements Handler{
                         "/" + this.httpRequest.getRequestURI() + File.separator);
                 return response;
             }
+
+            // if the file is a directory, then create a temporary file with a directory listing
+            file = file.createDirectoryListing();
+
         }
 
         String contentType = file.getContentType();
@@ -330,6 +323,10 @@ public class HTTPHandler implements Handler{
             response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_TYPE.getRepresentation(), contentType);
             response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_ENCODING.getRepresentation(), "identity");
         }
+
+        response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.LAST_MODIFIED.getRepresentation(),
+                file.getLastModifiedDate());
+
 
         response.setResource(file);
 
@@ -342,14 +339,46 @@ public class HTTPHandler implements Handler{
         return response;
     }
 
+    /**
+     * Resolves a HEAD request and returns a HTTPResponse.
+     *
+     * The HEAD request is resolved just as a GET Request, only we remove the
+     * resource associated with the GET.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolveHeadRequest(HTTPRequest request){
         HTTPResponse response = null;
+
+        response = this.resolveGetRequest(request);
+        response.removeResource();
 
         return response;
     }
 
+    /**
+     * Resolves a OPTIONS method request and returns a HTTPResponse.
+     *
+     * The OPTIONS method states for a given resource on the server what methods can be applied to it.
+     *
+     * This server has a general set of ALLOWED_OPTIONS that are applied to all resources on the server.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolveOptionsRequest(HTTPRequest request){
         HTTPResponse response = null;
+
+        response = HTTPResponse.getOKMessage();
+        StringBuilder sb = new StringBuilder();
+        for(HTTPConstants.REQUEST_TYPE req : HTTPConstants.ALLOWED_OPTIONS){
+            sb.append(req.getRepresentation());
+            sb.append(",");
+        }
+
+        response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.ALLOW.getRepresentation(), sb.substring(0, sb.length()-2));
+        response.addHeader(HTTPConstants.HTTP_ENTITY_HEADERS.CONTENT_TYPE.getRepresentation(), "httpd/unix-directory");
 
         return response;
     }

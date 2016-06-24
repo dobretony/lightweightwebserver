@@ -2,12 +2,15 @@ package com.ppb.lightweight.web.server.internal;
 
 import com.ppb.lightweight.web.server.errors.InternalServerError;
 import com.ppb.lightweight.web.server.logger.Logger;
+import com.ppb.lightweight.web.server.utils.Configurations;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -18,7 +21,6 @@ public class HTTPResponse {
     private String responseCode = null;
     private HashMap<String, String> responseHeaders = null;
     private WebServerFile resource = null;
-    private int contentLength = 0;
 
     public HTTPResponse(String responseCode){
 
@@ -29,6 +31,14 @@ public class HTTPResponse {
         builder.append(" \r\n");
         this.responseCode = builder.toString();
         this.responseHeaders =  new HashMap<>();
+
+        String today = new SimpleDateFormat(HTTPConstants.RFC1123_DATE_FORMAT).format(new Date());
+        this.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.DATE.getRepresentation(), today);
+
+        if(Configurations.SERVER_HOSTNAME != null) {
+            this.addHeader(HTTPConstants.HTTP_RESPONSE_HEADERS.SERVER.getRepresentation(),
+                    Configurations.SERVER_HOSTNAME);
+        }
 
     }
 
@@ -41,6 +51,14 @@ public class HTTPResponse {
         builder.append(" \r\n");
         this.responseCode = builder.toString();
         this.responseHeaders =  new HashMap<>();
+
+        String today = new SimpleDateFormat(HTTPConstants.RFC1123_DATE_FORMAT).format(new Date());
+        this.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.DATE.getRepresentation(), today);
+
+        if(Configurations.SERVER_HOSTNAME != null) {
+            this.addHeader(HTTPConstants.HTTP_RESPONSE_HEADERS.SERVER.getRepresentation(),
+                    Configurations.SERVER_HOSTNAME);
+        }
     }
 
     public HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES code){
@@ -76,6 +94,7 @@ public class HTTPResponse {
 
         HTTPResponse response = new HTTPResponse(errCode, errCode.getRepresentation());
         response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "close");
+
         return response;
 
     }
@@ -84,6 +103,7 @@ public class HTTPResponse {
 
         HTTPResponse response = new HTTPResponse(HTTPConstants.HTTP_RESPONSE_CODES.OK);
         response.addHeader(HTTPConstants.HTTP_GENERAL_HEADERS.CONNECTION.getRepresentation(), "keep-alive");
+
         return response;
 
     }
@@ -120,25 +140,16 @@ public class HTTPResponse {
         return !(this.resource == null);
     }
 
+    /**
+     * Returns the length in OCTET of the resource associated with this response.
+     *
+     * @return
+     */
     public long getContentLength(){
         if(this.hasResource()){
             return this.resource.length();
         }
         return 0;
-    }
-
-    public FileReader getResourceContent() throws InternalServerError{
-
-        FileReader inputStream = null;
-        try {
-            inputStream = new FileReader(this.resource);
-        } catch(FileNotFoundException e){
-            Logger.logE("Could not find a requested resource: " + this.resource.getAbsolutePath());
-            Logger.logE(e);
-            throw new InternalServerError("Error while finding resource.");
-        }
-
-        return inputStream;
     }
 
     /**
@@ -149,6 +160,14 @@ public class HTTPResponse {
      */
     public boolean isOK(){
         return this.responseCode.contains("200");
+    }
+
+    public WebServerFile getResource(){
+        return this.resource;
+    }
+
+    public void removeResource(){
+        this.resource = null;
     }
 
 }

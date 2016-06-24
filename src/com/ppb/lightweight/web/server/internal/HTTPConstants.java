@@ -1,6 +1,8 @@
 package com.ppb.lightweight.web.server.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,6 +16,17 @@ public class HTTPConstants {
      */
     public static final String RFC1123_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
+
+    /**
+     * A list containing the request methods implemented on the server. All other requests are server with a
+     * 405 Method Not Allowed.
+     */
+    public static final List<REQUEST_TYPE> ALLOWED_OPTIONS = Arrays.asList(
+            REQUEST_TYPE.GET,
+            REQUEST_TYPE.HEAD,
+            REQUEST_TYPE.POST,
+            REQUEST_TYPE.OPTIONS
+    );
 
     /**
      * Enumeration containing HTTP request types.
@@ -36,7 +49,7 @@ public class HTTPConstants {
             this.representation = representation;
         }
 
-        String getRepresentation(){
+        public String getRepresentation(){
             return this.representation;
         }
 
@@ -86,7 +99,7 @@ public class HTTPConstants {
             this.headerString = headerString;
         }
 
-        String getRepresentation(){
+        public String getRepresentation(){
             return this.headerString;
         }
     }
