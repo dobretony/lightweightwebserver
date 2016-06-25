@@ -4,7 +4,10 @@ import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
 import com.ppb.lightweight.web.server.internal.FileFactory;
 import com.ppb.lightweight.web.server.internal.LightweightWebServer;
 import com.ppb.lightweight.web.server.logger.Logger;
+import com.ppb.lightweight.web.server.utils.ConfigurationParser;
+import com.ppb.lightweight.web.server.utils.Configurations;
 
+import javax.security.auth.login.Configuration;
 import java.net.UnknownHostException;
 
 /**
@@ -17,13 +20,17 @@ public class LightweightWebServerMain {
         int EXIT_CODE = 0;
 
         try{
+            // First check if there is a configuration file
+            ConfigurationParser.parseConfigurationFile();
             // initialize Logger
             Logger.initializeLogger();
             // initialize FileSystem
             FileFactory.initializeFileSystem();
 
             // get an instance of the server
-            LightweightWebServer webServer = new LightweightWebServer("10.237.104.147", 8080, 50);
+            LightweightWebServer webServer = new LightweightWebServer(Configurations.SERVER_IP_ADDRESS,
+                                                                      Configurations.PORT_NUMBER,
+                                                                      Configurations.NO_OF_ACTIVE_CONN);
             webServer.run();
 
         } catch(WebServerInitializationException e){
