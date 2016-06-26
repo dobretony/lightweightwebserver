@@ -1,6 +1,6 @@
 #!/bin/sh
 SERVICE_NAME=LightweightWebServer
-PATH_TO_JAR=/usr/local/LightweightWebServer/lightweightwebserver.jar
+PATH_TO_JAR=./build/libs/lightweightwebserver-1.0.jar
 PID_PATH_NAME=/tmp/LightweightWebServer-pid
 case $1 in
     start)

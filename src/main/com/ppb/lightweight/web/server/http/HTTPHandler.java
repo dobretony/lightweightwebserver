@@ -1,7 +1,9 @@
-package com.ppb.lightweight.web.server.handlers;
+package com.ppb.lightweight.web.server.http;
 
-import com.ppb.lightweight.web.server.errors.InternalServerError;
 import com.ppb.lightweight.web.server.errors.MalformedRequestException;
+import com.ppb.lightweight.web.server.handlers.Handler;
+import com.ppb.lightweight.web.server.http.HTTPConstants;
+import com.ppb.lightweight.web.server.http.HTTPResponse;
 import com.ppb.lightweight.web.server.internal.*;
 import com.ppb.lightweight.web.server.logger.Logger;
 import com.ppb.lightweight.web.server.utils.Configurations;
@@ -17,7 +19,7 @@ import java.util.Date;
 /**
  * Created by DOBRE Antonel-George on 14.06.2016.
  */
-public class HTTPHandler implements Handler{
+public class HTTPHandler implements Handler {
 
     private Socket clientSocket = null;
     private BufferedReader clientSocketReader = null;
@@ -383,27 +385,51 @@ public class HTTPHandler implements Handler{
         return response;
     }
 
+    /**
+     * TRACE method request is not allowed.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolveTraceRequest(HTTPRequest request){
         HTTPResponse response = null;
-
+        response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.METHOD_NOT_ALLOWED);
         return response;
     }
 
+    /**
+     * CONNECT request method is not allowed.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolveConnectRequest(HTTPRequest request){
         HTTPResponse response = null;
-
+        response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.METHOD_NOT_ALLOWED);
         return response;
     }
 
+    /**
+     * DELETE request method is not allowed.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolveDeleteRequest(HTTPRequest request){
         HTTPResponse response = null;
-
+        response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.METHOD_NOT_ALLOWED);
         return response;
     }
 
+    /**
+     * PUT request method is not allowed.
+     *
+     * @param request
+     * @return
+     */
     private HTTPResponse resolvePutRequest(HTTPRequest request){
         HTTPResponse response = null;
-
+        response = HTTPResponse.getCloseMessage(HTTPConstants.HTTP_RESPONSE_CODES.METHOD_NOT_ALLOWED);
         return response;
     }
 

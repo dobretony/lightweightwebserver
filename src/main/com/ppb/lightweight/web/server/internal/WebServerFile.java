@@ -1,9 +1,8 @@
 package com.ppb.lightweight.web.server.internal;
 
 import com.ppb.lightweight.web.server.errors.MalformedRequestException;
+import com.ppb.lightweight.web.server.http.HTTPConstants;
 import com.ppb.lightweight.web.server.logger.Logger;
-import com.ppb.lightweight.web.server.utils.Configurations;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,8 +11,6 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.spi.FileTypeDetector;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,22 +1,16 @@
 package com.ppb.lightweight.web.server.internal;
 
 import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
-import com.ppb.lightweight.web.server.handlers.HTTPHandler;
+import com.ppb.lightweight.web.server.http.HTTPHandler;
 import com.ppb.lightweight.web.server.handlers.HandlerFactory;
 import com.ppb.lightweight.web.server.logger.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -77,6 +71,9 @@ public class LightweightWebServer {
             }
 
         }
+
+        this.cleanUp();
+
     }
 
     private void handleRequest(Socket clientSocket){
@@ -84,6 +81,25 @@ public class LightweightWebServer {
         HTTPHandler handler = new HTTPHandler(clientSocket);
         this.threadPool.submit(handler);
 
+    }
+
+    private void cleanUp(){
+
+        // first stop all the threads
+        this.threadPool.shutdownNow();
+
+        // afterwards close the server socket
+        try {
+            this.serverSocket.close();
+            this.serverSocket = null;
+        } catch (IOException e){
+            Logger.logE("The server socket was not closed properly.");
+        }
+
+    }
+
+    public void stop(){
+        this.isRunning = false;
     }
 
 }

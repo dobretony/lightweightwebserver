@@ -1,13 +1,11 @@
-package com.ppb.lightweight.web.server.internal;
+package com.ppb.lightweight.web.server.http;
 
 import com.ppb.lightweight.web.server.errors.InternalServerError;
 import com.ppb.lightweight.web.server.errors.MalformedRequestException;
-import com.ppb.lightweight.web.server.utils.IPUtils;
-import com.ppb.lightweight.web.server.internal.HTTPConstants.REQUEST_TYPE;
+import com.ppb.lightweight.web.server.http.HTTPConstants.REQUEST_TYPE;
 
 import java.net.InetAddress;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  * Created by DOBRE Antonel-George on 15.06.2016.

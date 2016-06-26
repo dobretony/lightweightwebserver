@@ -1,6 +1,6 @@
 package com.ppb.lightweight.web.server.errors;
 
-import com.ppb.lightweight.web.server.internal.HTTPConstants.HTTP_RESPONSE_CODES;
+import com.ppb.lightweight.web.server.http.HTTPConstants.HTTP_RESPONSE_CODES;
 
 /**
  * Class that represents the Exception thrown when a bad request was identified by HTTPRequest methods.

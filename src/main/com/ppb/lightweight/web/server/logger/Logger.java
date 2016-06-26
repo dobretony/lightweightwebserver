@@ -6,7 +6,7 @@ import com.ppb.lightweight.web.server.errors.WebServerInitializationException;
 import com.ppb.lightweight.web.server.utils.Configurations;
 import com.ppb.lightweight.web.server.utils.Constants;
 import com.ppb.lightweight.web.server.utils.Utils;
-import sun.rmi.runtime.Log;
+import org.classpath.icedtea.Config;
 
 /**
  * Created by tony on 14.06.2016.
@@ -63,8 +63,7 @@ public class Logger {
         }
 
         // initialize the Logger class
-        //Logger.logger = new Logger(logfile.getAbsolutePath());
-        Logger.logger = new Logger(null);
+        Logger.logger = new Logger(logfile.getAbsolutePath());
 
     }
 
@@ -101,6 +100,10 @@ public class Logger {
 
     public static synchronized void logD(String message){
 
+        if(Configurations.DEBUG == null){
+            return;
+        }
+
         if(Logger.logger == null)
             return;
 
@@ -113,6 +116,10 @@ public class Logger {
     }
 
     public static synchronized void logV(String message){
+
+        if(Configurations.VERBOSE == null){
+            return;
+        }
 
         if(Logger.logger == null)
             return;

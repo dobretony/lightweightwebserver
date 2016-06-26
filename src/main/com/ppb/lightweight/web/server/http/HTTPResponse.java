@@ -1,14 +1,8 @@
-package com.ppb.lightweight.web.server.internal;
+package com.ppb.lightweight.web.server.http;
 
-import com.ppb.lightweight.web.server.errors.InternalServerError;
-import com.ppb.lightweight.web.server.logger.Logger;
+import com.ppb.lightweight.web.server.internal.WebServerFile;
 import com.ppb.lightweight.web.server.utils.Configurations;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;

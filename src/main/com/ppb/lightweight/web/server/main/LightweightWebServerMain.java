@@ -15,11 +15,24 @@ import java.net.UnknownHostException;
  */
 public class LightweightWebServerMain {
 
+    public static LightweightWebServer webServer = null;
+
     public static void main(String[] args){
 
         int EXIT_CODE = 0;
 
         try{
+            // add shutdown code in case the VM is shutting down.
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if(webServer != null){
+                        webServer.stop();
+                    }
+                }
+            }));
+
+
             // First check if there is a configuration file
             ConfigurationParser.parseConfigurationFile();
             // initialize Logger
@@ -28,25 +41,24 @@ public class LightweightWebServerMain {
             FileFactory.initializeFileSystem();
 
             // get an instance of the server
-            LightweightWebServer webServer = new LightweightWebServer(Configurations.SERVER_IP_ADDRESS,
+            webServer = new LightweightWebServer(Configurations.SERVER_IP_ADDRESS,
                                                                       Configurations.PORT_NUMBER,
                                                                       Configurations.NO_OF_ACTIVE_CONN);
             webServer.run();
 
         } catch(WebServerInitializationException e){
-            System.err.println("There was a problem initializing the server: \n" + e.getLocalizedMessage());
-            System.err.println("Aborting..");
+            Logger.logE("There was a problem initializing the server: \n" + e.getLocalizedMessage());
+            Logger.logE("Aborting..");
             EXIT_CODE = -1;
         } catch (UnknownHostException e){
-            System.err.println("Could not bind to specific address. Please check your configuration.");
-            System.err.println("Aborting..");
+            Logger.logE("Could not bind to specific address. Please check your configuration.");
+            Logger.logE("Aborting..");
             EXIT_CODE = -1;
-        } finally {
-            System.out.println("Have a nice day.");
-            System.exit(EXIT_CODE);
         }
 
-
+        Logger.log("Have a nice day.");
+        Logger.finalizeLogger();
+        System.exit(EXIT_CODE);
 
     }
 

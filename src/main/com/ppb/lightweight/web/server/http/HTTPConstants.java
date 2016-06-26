@@ -1,9 +1,10 @@
-package com.ppb.lightweight.web.server.internal;
+package com.ppb.lightweight.web.server.http;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import com.ppb.lightweight.web.server.errors.InternalServerError;
+import com.ppb.lightweight.web.server.errors.MalformedRequestException;
+
+import java.net.InetAddress;
+import java.util.*;
 
 /**
  * Created by tony on 16.06.2016.
@@ -12,7 +13,6 @@ public class HTTPConstants {
 
     /**
      * Date format used by HTTP 1.1 as defined in RFC 1123.
-     *
      */
     public static final String RFC1123_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
@@ -45,31 +45,32 @@ public class HTTPConstants {
         UNDEFINED("UNDEFINED");
 
         private final String representation;
-        REQUEST_TYPE(String representation){
+
+        REQUEST_TYPE(String representation) {
             this.representation = representation;
         }
 
-        public String getRepresentation(){
+        public String getRepresentation() {
             return this.representation;
         }
 
 
-        public static REQUEST_TYPE getRequestType(String requestLine){
-            if(requestLine.contains("GET"))
+        public static REQUEST_TYPE getRequestType(String requestLine) {
+            if (requestLine.contains("GET"))
                 return REQUEST_TYPE.GET;
-            else if(requestLine.contains("POST"))
+            else if (requestLine.contains("POST"))
                 return REQUEST_TYPE.POST;
-            else if(requestLine.contains("HEAD"))
+            else if (requestLine.contains("HEAD"))
                 return REQUEST_TYPE.HEAD;
-            else if(requestLine.contains("OPTIONS"))
+            else if (requestLine.contains("OPTIONS"))
                 return REQUEST_TYPE.OPTIONS;
-            else if(requestLine.contains("PUT"))
+            else if (requestLine.contains("PUT"))
                 return REQUEST_TYPE.PUT;
-            else if(requestLine.contains("TRACE"))
+            else if (requestLine.contains("TRACE"))
                 return REQUEST_TYPE.TRACE;
-            else if(requestLine.contains("DELETE"))
+            else if (requestLine.contains("DELETE"))
                 return REQUEST_TYPE.DELETE;
-            else if(requestLine.contains("CONNECT"))
+            else if (requestLine.contains("CONNECT"))
                 return REQUEST_TYPE.CONNECT;
             else
                 return REQUEST_TYPE.UNDEFINED;
@@ -95,11 +96,12 @@ public class HTTPConstants {
         WARNING("Warning");
 
         private final String headerString;
-        HTTP_GENERAL_HEADERS(String headerString){
+
+        HTTP_GENERAL_HEADERS(String headerString) {
             this.headerString = headerString;
         }
 
-        public String getRepresentation(){
+        public String getRepresentation() {
             return this.headerString;
         }
     }
@@ -133,11 +135,12 @@ public class HTTPConstants {
         USER_AGENT("User-Agent");
 
         private final String headerString;
-        HTTP_REQUEST_HEADERS(String headerString){
+
+        HTTP_REQUEST_HEADERS(String headerString) {
             this.headerString = headerString;
         }
 
-        public String getRepresentation(){
+        public String getRepresentation() {
             return this.headerString;
         }
 
@@ -163,11 +166,12 @@ public class HTTPConstants {
 
 
         private final String headerString;
-        HTTP_RESPONSE_HEADERS(String headerString){
+
+        HTTP_RESPONSE_HEADERS(String headerString) {
             this.headerString = headerString;
         }
 
-        public String getRepresentation(){
+        public String getRepresentation() {
             return this.headerString;
         }
 
@@ -193,11 +197,12 @@ public class HTTPConstants {
         LAST_MODIFIED("Last-Modified");
 
         private final String headerString;
-        HTTP_ENTITY_HEADERS(String headerString){
+
+        HTTP_ENTITY_HEADERS(String headerString) {
             this.headerString = headerString;
         }
 
-        public String getRepresentation(){
+        public String getRepresentation() {
             return this.headerString;
         }
 
@@ -254,7 +259,8 @@ public class HTTPConstants {
 
         private final int code;
         private final String representation;
-        HTTP_RESPONSE_CODES(int code, String representation){
+
+        HTTP_RESPONSE_CODES(int code, String representation) {
             this.code = code;
             this.representation = representation;
         }
@@ -262,6 +268,7 @@ public class HTTPConstants {
         public String getRepresentation() {
             return representation;
         }
+
         public int getCode() {
             return this.code;
         }
@@ -270,6 +277,7 @@ public class HTTPConstants {
     // a list containing the string representation of HTTP GENERAL HEADER Enumeration
     // this list is more for caching purposes
     private static List<String> httpGeneralHeadersStringList = null;
+
     public static List<String> getGeneralHeadersStringList() {
         if (httpGeneralHeadersStringList == null) {
             httpGeneralHeadersStringList = new ArrayList<>();
@@ -282,6 +290,7 @@ public class HTTPConstants {
     }
 
     private static List<String> httpRequestHeadersStringList = null;
+
     public static List<String> getHttpRequestHeadersStringList() {
         if (httpRequestHeadersStringList == null) {
             httpRequestHeadersStringList = new ArrayList<>();
@@ -293,6 +302,7 @@ public class HTTPConstants {
     }
 
     private static List<String> httpResponseHeaderStringList = null;
+
     public static List<String> getHttpResponseHeaderStringList() {
         if (httpResponseHeaderStringList == null) {
             httpResponseHeaderStringList = new ArrayList<>();
@@ -304,8 +314,9 @@ public class HTTPConstants {
     }
 
     private static List<String> httpEntityHeaderStringList = null;
-    public static List<String> getHttpEntityHeaderStringList(){
-        if(httpEntityHeaderStringList == null) {
+
+    public static List<String> getHttpEntityHeaderStringList() {
+        if (httpEntityHeaderStringList == null) {
             httpEntityHeaderStringList = new ArrayList<>();
             for (HTTP_ENTITY_HEADERS header : HTTP_ENTITY_HEADERS.values()) {
                 httpEntityHeaderStringList.add(header.getRepresentation());
@@ -313,5 +324,4 @@ public class HTTPConstants {
         }
         return httpEntityHeaderStringList;
     }
-
 }

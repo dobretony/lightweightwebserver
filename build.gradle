@@ -1,2 +1,45 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+
+sourceCompatibility = 1.7
+version = '1.0'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main'
+        }
+        resources {
+            srcDir 'src/resources'
+        }
+    }
+}
+
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+jar {
+	manifest {
+		attributes 'Implementation-Title': 'Lightweight Web Server',
+			   'Implementation-Version': version,
+			   'Main-Class' : 'com.ppb.lightweight.web.server.main.LightweightWebServerMain'
+	}
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'bin'
+       }
+    }
+}
+
+task getHomeDir << {
+    println gradle.gradleHomeDir
+}
