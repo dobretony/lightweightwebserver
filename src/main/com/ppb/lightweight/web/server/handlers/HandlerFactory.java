@@ -1,7 +1,12 @@
 package com.ppb.lightweight.web.server.handlers;
 
 /**
- * Created by tony on 14.06.2016.
+ * The Handler Factory class should be used to create instances of Handler objects, based on the
+ * request received from the client.
+ *
+ * This class is not used at the moment, but should be left here for future use.
+ *
+ * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class HandlerFactory {
 

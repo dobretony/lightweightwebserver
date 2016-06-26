@@ -8,6 +8,9 @@ import java.net.InetAddress;
 import java.util.HashMap;
 
 /**
+ * A HTTPRequest object contains all the data received from a client request, including
+ * header fields, request methods, content and parameters.
+ *
  * Created by DOBRE Antonel-George on 15.06.2016.
  */
 public class HTTPRequest {

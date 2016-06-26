@@ -11,7 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Created by tony on 25.06.2016.
+ * Class that handles the parsing of the configuration file.
+ *
+ * The configuration file cannot be changed, it is always lightweightwebserver.config,
+ * based in the same directory the web server started.
+ *
+ *
+ * Created by DOBRE Antonel-George on 25.06.2016.
  */
 public class ConfigurationParser {
 

@@ -11,6 +11,12 @@ import javax.security.auth.login.Configuration;
 import java.net.UnknownHostException;
 
 /**
+ * Main entry point for the Lightweight Web Server.
+ *
+ * Handles initializations, signal handling in case of Shutdown and clean up.
+ *
+ * Also starts the main loop, by invoking LightweightWebServer.run() method.
+ *
  * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class LightweightWebServerMain {

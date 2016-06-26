@@ -1,13 +1,11 @@
 package com.ppb.lightweight.web.server.http;
 
-import com.ppb.lightweight.web.server.errors.InternalServerError;
-import com.ppb.lightweight.web.server.errors.MalformedRequestException;
-
-import java.net.InetAddress;
 import java.util.*;
 
 /**
- * Created by tony on 16.06.2016.
+ * Class that holds all the HTTP 1.1 constants, such as Header names, Response codes, datetime format.
+ *
+ * Created by DOBRE Antonel-George on 16.06.2016.
  */
 public class HTTPConstants {
 

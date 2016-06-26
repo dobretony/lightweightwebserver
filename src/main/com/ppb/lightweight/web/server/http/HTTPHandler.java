@@ -17,6 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Handler for basic HTTP requests received from clients.
+ *
+ * This class maintains the socket connection with the client and listens for any requests.
+ * For each request, a HTTPResponse object is created that can be sent back to the client.
+ *
  * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class HTTPHandler implements Handler {

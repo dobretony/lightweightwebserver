@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
+ * A HTTPResponse object contains the response for a given client request, including
+ * headers, response code and a link to a certain resource that should be sent back to the client.
+ *
  * Created by DOBRE Antonel-George on 15.06.2016.
  */
 public class HTTPResponse {

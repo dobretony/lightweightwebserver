@@ -9,7 +9,16 @@ import com.ppb.lightweight.web.server.utils.Utils;
 import org.classpath.icedtea.Config;
 
 /**
- * Created by tony on 14.06.2016.
+ * A logging class with methods specific for writing in log files.
+ *
+ * The log file has a specific form:
+ *      lightweightwebserver-<timestamp>.log
+ * where timestamp is the datetime the server has launched.
+ *
+ * The logger saves these files in the folder specified by the
+ * LOG_FOLDER_PATH configuration option.
+ *
+ * Created by DOBRE Antonel-Goerge on 14.06.2016.
  */
 public class Logger {
 

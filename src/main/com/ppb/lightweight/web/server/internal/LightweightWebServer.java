@@ -14,7 +14,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created by tony on 14.06.2016.
+ * Main class of the application. Handles the initialization of the server socket,
+ * listens for client connections and passes the new client sockets to handlers.
+ *
+ * Also handles the Thread pool for this server.
+ *
+ * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class LightweightWebServer {
 

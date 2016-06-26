@@ -1,7 +1,9 @@
 package com.ppb.lightweight.web.server.utils;
 
 /**
- * Created by tony on 14.06.2016.
+ * Class with a bunch of useful constants used throughout the project.
+ *
+ * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class Constants {
     public static final String DEFAULT_LOGGER_FILE = "logs.txt";

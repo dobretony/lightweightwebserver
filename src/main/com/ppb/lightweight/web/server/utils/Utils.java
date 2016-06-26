@@ -4,7 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by tony on 14.06.2016.
+ * Class with useful static methods for different internal server usages.
+ *
+ * Created by DOBRE Antonel-George on 14.06.2016.
  */
 public class Utils {
     public static String getCurrentTimestampString(){
